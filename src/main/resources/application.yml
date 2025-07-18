@@ -1,0 +1,32 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: subscription-service
+  datasource:
+    url: jdbc:postgresql://localhost:5440/subscriptiondb
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update  # ✅ enables auto table creation in dev
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yml
+
+product:
+  service:
+    base-url: http://13.230.194.245:8080  # Replace with actual URL if needed
+
+
+organization:
+  service:
+    base-url: http://localhost:8081  # Set to your organization service URL
+    auth-token: eyJhbGciOiJSUzI1NiJ9.eyJlbWFpbCI6InN0cmluZ0BnbWFpbC5jb20iLCJ1c2VySWQiOiJjNDYxMGE1Ny00ODY0LTQyZDAtOWI1Zi01MTA5ZTM1ZWFmNTEiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoic3RyaW5nQGdtYWlsLmNvbSIsImlhdCI6MTc1MTI2NDU3MSwiZXhwIjoxNzUxMjY1NDcxfQ.WE7BUA1WDy-Lc3UIknhXItONLFvIegj7rspT1ZuaNOtq2PMq0YVnrpmCfjgolssiH9ADnHic8B2Xv9TaWhsj_ZJgOxRAYZfE42Pjf-8-kGoLDykXwt_Q7rLq4ane1zp8gCpgezfNXzBR3DUODbYDHAFNzkDHuBEmOHbRvUE1e7Z6bDiTthCpPdl2rG63KaALexxumVMmAaUf9UtKMkGxRsfU05MOVcNtcnc0OCYTBtDjQI-RISNizyLtdw434OyFm015eQPo980Ipg9_ZxjGZlgOonku-UgES7crnLgdgRIEUbHhEjnbz3lN7r7HMwduj09Gtn-T589i0BVzYNiAVQ  # Replace if running in Docker
+
+logging:
+  level:
+    org.springframework.web.reactive.function.client: DEBUG
