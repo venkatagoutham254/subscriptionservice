@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, Object>> handleExternalServiceException(ExternalServiceException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage()); // Already contains: "organizationId is invalid", etc.
+        body.put("error", ex.getMessage()); // Cleaned up error message, removed organizationId/ divisionId references.
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 

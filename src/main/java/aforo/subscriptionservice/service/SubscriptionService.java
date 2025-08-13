@@ -8,4 +8,5 @@ public interface SubscriptionService {
     SubscriptionResponse createSubscription(SubscriptionCreateRequest request);
     SubscriptionResponse updateSubscription(Long subscriptionId, SubscriptionUpdateRequest request);
     SubscriptionResponse getSubscription(Long subscriptionId);
+    SubscriptionResponse confirmSubscription(Long subscriptionId);
 }

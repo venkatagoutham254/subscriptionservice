@@ -1,6 +1,5 @@
 aforo/subscriptionservice/dto/SubscriptionResponse.class
 aforo/subscriptionservice/service/impl/SubscriptionServiceImpl.class
-aforo/subscriptionservice/client/OrganizationClient.class
 aforo/subscriptionservice/service/SubscriptionService.class
 aforo/subscriptionservice/mapper/SubscriptionMapper.class
 aforo/subscriptionservice/controller/SubscriptionController.class
