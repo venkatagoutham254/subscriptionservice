@@ -1,9 +1,10 @@
 package aforo.subscriptionservice.dto;
 
-import aforo.subscriptionservice.entity.SubscriptionStatus;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import aforo.subscriptionservice.entity.SubscriptionStatus; // or enums
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class SubscriptionUpdateRequest {
 
-    private LocalDateTime endDate;
+    private String adminNotes;
 
     private SubscriptionStatus status;
 }

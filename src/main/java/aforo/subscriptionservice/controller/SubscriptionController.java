@@ -32,4 +32,9 @@ public class SubscriptionController {
     public ResponseEntity<SubscriptionResponse> get(@PathVariable Long subscriptionId) {
         return ResponseEntity.ok(subscriptionService.getSubscription(subscriptionId));
     }
+
+    @PostMapping("/{subscriptionId}/confirm")
+    public ResponseEntity<SubscriptionResponse> confirm(@PathVariable Long subscriptionId) {
+        return ResponseEntity.ok(subscriptionService.confirmSubscription(subscriptionId));
+    }
 }

@@ -12,14 +12,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints: { primaryKey: true, nullable: false }
 
-              - column:
-                  name: organization_id
-                  type: UUID
-                  constraints: { nullable: false }
 
-              - column:
-                  name: division_id
-                  type: UUID
 
               - column:
                   name: customer_id
@@ -58,6 +51,11 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
+
+              - column:
+                  name: admin_notes
+                  type: VARCHAR(255)
+                  constraints: { nullable: true }
                   defaultValueComputed: CURRENT_TIMESTAMP
                   constraints: { nullable: false }
 
