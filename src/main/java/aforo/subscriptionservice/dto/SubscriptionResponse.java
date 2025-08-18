@@ -2,6 +2,7 @@ package aforo.subscriptionservice.dto;
 
 import java.util.UUID;
 
+import aforo.subscriptionservice.entity.PaymentType;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 import lombok.*;
 
@@ -14,12 +15,13 @@ import java.time.LocalDateTime;
 public class SubscriptionResponse {
 
     private Long subscriptionId;
-    private UUID customerId; // Changed from Integer to UUID
-    private Integer productId;
-    private Integer ratePlanId;
+    private Long customerId; // Changed from Integer to UUID
+    private Long productId;
+    private Long ratePlanId;
     private SubscriptionStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+private PaymentType paymentType;
 
     private String adminNotes;
 }

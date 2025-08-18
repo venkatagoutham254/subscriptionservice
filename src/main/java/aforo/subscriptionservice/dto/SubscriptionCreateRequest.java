@@ -2,7 +2,7 @@ package aforo.subscriptionservice.dto;
 
 import java.util.UUID;
 
-
+import aforo.subscriptionservice.entity.PaymentType;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -15,16 +15,18 @@ import lombok.*;
 public class SubscriptionCreateRequest {
 
     @NotNull
-    private UUID customerId; 
+    private Long customerId; 
 
     
 
     @NotNull
-    private Integer productId;
+    private Long productId;
 
     @NotNull
-    private Integer ratePlanId;
+    private Long ratePlanId;
 
+@NotNull(message = "Payment type is required")
+private PaymentType paymentType;
 
 
 
