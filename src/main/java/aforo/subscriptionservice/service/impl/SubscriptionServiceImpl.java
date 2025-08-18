@@ -40,12 +40,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionResponse createSubscription(SubscriptionCreateRequest request) {
-        // Validate all required references
+        // Validate that the rate plan exists and belongs to the specified product
+        productRatePlanClient.validateRatePlan(request.getRatePlanId(), request.getProductId());
 
-
-        productRatePlanClient.validateProduct(request.getProductId());
-        productRatePlanClient.validateRatePlan(request.getRatePlanId());
-
+        // Create and save the subscription
         Subscription subscription = mapper.toEntity(request);
         return mapper.toResponse(repository.save(subscription));
     }
