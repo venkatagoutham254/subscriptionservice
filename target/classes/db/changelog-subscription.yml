@@ -16,23 +16,20 @@ databaseChangeLog:
 
               - column:
                   name: customer_id
-                  type: UUID
+                  type: Long
                   constraints: { nullable: false }
 
               - column:
                   name: product_id
-                  type: INTEGER
+                  type: Long
                   constraints: { nullable: false }
 
               - column:
                   name: rate_plan_id
-                  type: INTEGER
+                  type: Long
                   constraints: { nullable: false }
 
-              - column:
-                  name: billing_frequency
-                  type: INTEGER
-                  constraints: { nullable: false }
+
 
               - column:
                   name: status
@@ -58,6 +55,12 @@ databaseChangeLog:
                   constraints: { nullable: true }
                   defaultValueComputed: CURRENT_TIMESTAMP
                   constraints: { nullable: false }
+
+              - column:
+                  name: payment_type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false                  
 
               - column:
                   name: updated_at
