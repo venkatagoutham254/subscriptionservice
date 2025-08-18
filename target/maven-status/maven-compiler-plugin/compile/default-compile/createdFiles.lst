@@ -1,3 +1,4 @@
+aforo/subscriptionservice/client/dto/CustomerDTO.class
 aforo/subscriptionservice/service/impl/SubscriptionServiceImpl.class
 aforo/subscriptionservice/controller/SubscriptionController.class
 aforo/subscriptionservice/assembler/SubscriptionAssembler.class
@@ -8,6 +9,7 @@ aforo/subscriptionservice/config/WebClientConfig.class
 aforo/subscriptionservice/exception/GlobalExceptionHandler.class
 aforo/subscriptionservice/dto/SubscriptionResponse.class
 aforo/subscriptionservice/service/SubscriptionService.class
+aforo/subscriptionservice/client/CustomerServiceClient.class
 aforo/subscriptionservice/mapper/SubscriptionMapper.class
 aforo/subscriptionservice/entity/Subscription$SubscriptionBuilder.class
 aforo/subscriptionservice/exception/ExternalServiceException.class
@@ -20,3 +22,4 @@ aforo/subscriptionservice/entity/Subscription.class
 aforo/subscriptionservice/SusbcriptionserviceApplication.class
 aforo/subscriptionservice/entity/PaymentType.class
 aforo/subscriptionservice/dto/SubscriptionCreateRequest.class
+aforo/subscriptionservice/config/WebConfig.class
