@@ -5,11 +5,14 @@ services:
     build: .
     container_name: subscription-service
     ports:
-      - "8083:8083"
+      - "8084:8084"
     depends_on:
       - subscriptiondb
     environment:
       SPRING_PROFILES_ACTIVE: default
+      SPRING_DATASOURCE_URL: jdbc:postgresql://subscriptiondb:5432/subscriptiondb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     networks:
       - aforo-network
 
@@ -21,7 +24,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5440:5432" # External:Internal (optional)
+      - "5436:5432" # External:Internal (optional)
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
