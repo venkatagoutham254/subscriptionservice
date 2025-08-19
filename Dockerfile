@@ -1,4 +1,5 @@
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 WORKDIR /app
-COPY target/susbcriptionservice-0.0.1-SNAPSHOT.jar subscriptionservice.jar
-ENTRYPOINT ["java", "-jar", "subscriptionservice.jar"]
+COPY app.jar app.jar
+EXPOSE 8084
+ENTRYPOINT ["java", "-jar", "app.jar"]
