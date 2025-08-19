@@ -1,0 +1,26 @@
+# Java & Maven
+/target/
+!target/classes/
+!target/test-classes/
+
+# Logs
+*.log
+
+# IDE & tooling
+.idea/
+.vscode/
+*.iml
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.jar
+app.jar
+
+# CI/CD temporary files
+ec2-key.pem
+
+# Docker
+*.env

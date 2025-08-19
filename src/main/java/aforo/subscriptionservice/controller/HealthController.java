@@ -11,7 +11,7 @@ import java.util.Map;
  * Health check endpoint to verify that the service is running.
  */
 @RestController
-@RequestMapping("/health")
+@RequestMapping("/api/health")
 public class HealthController {
 
     @GetMapping
