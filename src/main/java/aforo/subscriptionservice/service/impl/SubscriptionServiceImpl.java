@@ -13,6 +13,8 @@ import aforo.subscriptionservice.entity.SubscriptionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +71,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return repository.findById(subscriptionId)
                 .map(mapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
+    }
+
+    @Override
+    public List<SubscriptionResponse> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

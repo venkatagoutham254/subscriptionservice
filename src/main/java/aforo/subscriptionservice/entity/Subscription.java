@@ -19,7 +19,7 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subscriptionId;
 
-    private Long customerId; // Changed from Integer to UUID
+    private Long customerId;
 
     private Long productId;
 
