@@ -45,4 +45,10 @@ public class SubscriptionController {
     public List<SubscriptionResponse> getAll() {
         return subscriptionService.findAll();
     }
+
+    @DeleteMapping("/{subscriptionId}")
+    public ResponseEntity<Void> delete(@PathVariable Long subscriptionId) {
+        subscriptionService.delete(subscriptionId);
+        return ResponseEntity.noContent().build(); // 204
+    }
 }

@@ -12,4 +12,5 @@ public interface SubscriptionService {
     SubscriptionResponse getSubscription(Long subscriptionId);
     SubscriptionResponse confirmSubscription(Long subscriptionId);
     List<SubscriptionResponse> findAll();
+    void delete(Long subscriptionId);
 }
