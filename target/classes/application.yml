@@ -21,8 +21,6 @@ product:
   service:
     base-url: http://54.238.204.246:8080  # Replace with actual URL if needed
 
-
-
 logging:
   level:
     org.springframework.web.reactive.function.client: DEBUG

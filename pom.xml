@@ -47,11 +47,34 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>   
+         <!-- Spring Boot test bundle (JUnit 5, Mockito, JSON, MockMvc...) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+            <exclusion>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+            </exclusion>
+            </exclusions>
         </dependency>
+
+        <!-- Optional: Mockito JUnit 5 runner (already included via starter above; ok to skip) -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+
+
     </dependencies>
     <build>
         <plugins>
