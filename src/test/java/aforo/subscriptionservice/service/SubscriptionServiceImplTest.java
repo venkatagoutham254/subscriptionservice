@@ -13,10 +13,11 @@ import aforo.subscriptionservice.repository.SubscriptionRepository;
 import aforo.subscriptionservice.service.impl.SubscriptionServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Pure unit tests for SubscriptionServiceImpl.
+ * Covers happy paths + 404 cases + new delete() method.
+ */
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceImplTest {
 
@@ -50,9 +55,12 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    void getSubscription_notFound_throws() {
+    void getSubscription_notFound_throws404() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.getSubscription(99L));
+
+        ResponseStatusException ex =
+                assertThrows(ResponseStatusException.class, () -> service.getSubscription(99L));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 
     @Test
@@ -84,30 +92,40 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
+    void confirmSubscription_notFound_throws404() {
+        Long id = 404L;
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        ResponseStatusException ex =
+                assertThrows(ResponseStatusException.class, () -> service.confirmSubscription(id));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+
+    @Test
     void createSubscription_valid_saves_andMaps() {
-        // 1) Build a non-null request
+        // Build a non-null request
         SubscriptionCreateRequest req = new SubscriptionCreateRequest();
         req.setCustomerId(1L);
         req.setProductId(2L);
         req.setRatePlanId(3L);
-        req.setPaymentType(PaymentType.PREPAID); // adjust enum/package
+        req.setPaymentType(PaymentType.PREPAID);
         req.setAdminNotes("note");
 
-        // 2) Stub external clients with matching args
+        // Stub external validators (void methods)
         doNothing().when(customerClient).validateCustomer(eq(1L));
         doNothing().when(productRatePlanClient).validateProduct(eq(2L));
         doNothing().when(productRatePlanClient).validateProductRatePlanLinkage(eq(2L), eq(3L));
 
-        // 3) Mapper & repo stubs
+        // Mapper & repo stubs
         Subscription entity = new Subscription();
         when(mapper.toEntity(req)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponse(entity)).thenReturn(mock(SubscriptionResponse.class));
 
-        // 4) Call
+        // Call
         SubscriptionResponse out = service.createSubscription(req);
 
-        // 5) Assert + verify
+        // Assert + verify
         assertNotNull(out);
         verify(customerClient).validateCustomer(1L);
         verify(productRatePlanClient).validateProduct(2L);
@@ -115,11 +133,10 @@ class SubscriptionServiceImplTest {
         verify(repository).save(entity);
     }
 
-
     @Test
     void updateSubscription_maps_andSaves() {
         Long id = 100L;
-        SubscriptionUpdateRequest req = new SubscriptionUpdateRequest(); // set fields if needed
+        SubscriptionUpdateRequest req = new SubscriptionUpdateRequest();
 
         Subscription existing = new Subscription();
         when(repository.findById(id)).thenReturn(Optional.of(existing));
@@ -129,8 +146,30 @@ class SubscriptionServiceImplTest {
         SubscriptionResponse out = service.updateSubscription(id, req);
 
         assertNotNull(out);
+        // Adjust params order to match your mapper signature
         verify(mapper).updateEntityFromRequest(eq(req), eq(existing));
         verify(repository).save(existing);
         verify(mapper).toResponse(existing);
+    }
+
+    @Test
+    void delete_exists_deletes() {
+        Long id = 15L;
+        when(repository.existsById(id)).thenReturn(true);
+
+        service.delete(id);
+
+        verify(repository).deleteById(id);
+    }
+
+    @Test
+    void delete_notFound_throws404_andDoesNotDelete() {
+        Long id = 16L;
+        when(repository.existsById(id)).thenReturn(false);
+
+        ResponseStatusException ex =
+                assertThrows(ResponseStatusException.class, () -> service.delete(id));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+        verify(repository, never()).deleteById(anyLong());
     }
 }

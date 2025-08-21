@@ -12,6 +12,10 @@ import aforo.subscriptionservice.service.SubscriptionService;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +33,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionResponse confirmSubscription(Long subscriptionId) {
         Subscription subscription = repository.findById(subscriptionId)
-                .orElseThrow(() -> new RuntimeException("Subscription not found"));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+
 
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE) {
             subscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -58,7 +63,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionResponse updateSubscription(Long subscriptionId, SubscriptionUpdateRequest request) {
         Subscription subscription = repository.findById(subscriptionId)
-                .orElseThrow(() -> new RuntimeException("Subscription not found"));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+
 
         // ✅ Delegate field updates (including paymentType) to mapper
         mapper.updateEntityFromRequest(request, subscription);
@@ -70,7 +76,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public SubscriptionResponse getSubscription(Long subscriptionId) {
         return repository.findById(subscriptionId)
                 .map(mapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Subscription not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+
     }
 
     @Override
@@ -79,5 +86,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long subscriptionId) {
+        if (!repository.existsById(subscriptionId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found");
+        }
+        repository.deleteById(subscriptionId);
     }
 }
