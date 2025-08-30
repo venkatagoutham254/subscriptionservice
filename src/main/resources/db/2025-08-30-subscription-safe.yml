@@ -137,4 +137,18 @@ databaseChangeLog:
             columnDataType: TIMESTAMP
 
   - changeSet:
-      id: 2025-08-30-09-nullable-payme
+      id: 2025-08-30-09-nullable-payment_type
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='payment_type' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: payment_type
+            columnDataType: VARCHAR(20)
