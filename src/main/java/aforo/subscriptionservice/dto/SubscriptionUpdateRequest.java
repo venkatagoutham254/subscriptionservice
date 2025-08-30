@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+/**
+ * Request object for updating a subscription.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +21,11 @@ public class SubscriptionUpdateRequest {
     private SubscriptionStatus status;
 
     private PaymentType paymentType;
+
+    private Long customerId;
+
+    private Long productId;
+
+    private Long ratePlanId;
 
 }
