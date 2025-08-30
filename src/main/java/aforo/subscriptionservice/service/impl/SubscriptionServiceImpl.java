@@ -35,26 +35,42 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Subscription subscription = repository.findById(subscriptionId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
 
+        // Validate required fields before activation
+        StringBuilder missing = new StringBuilder();
+        if (subscription.getCustomerId() == null) missing.append("customerId,");
+        if (subscription.getProductId() == null) missing.append("productId,");
+        if (subscription.getRatePlanId() == null) missing.append("ratePlanId,");
+        if (subscription.getPaymentType() == null) missing.append("paymentType,");
+
+        if (missing.length() > 0) {
+            // trim trailing comma
+            String msg = "Cannot confirm subscription: missing required fields [" + missing.substring(0, missing.length()-1) + "]";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
+        }
 
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE) {
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setUpdatedAt(LocalDateTime.now());
-            repository.save(subscription);
+            subscription.setLastUpdated(LocalDateTime.now());
+            subscription = repository.save(subscription);
         }
         return mapper.toResponse(subscription);
     }
     @Override
     public SubscriptionResponse createSubscription(SubscriptionCreateRequest request) {
-        // ✅ Validate customer first
-        customerServiceClient.validateCustomer(request.getCustomerId());
-    
-        // ✅ Validate product & rate plan existence
-        productRatePlanClient.validateProduct(request.getProductId());
-        productRatePlanClient.validateRatePlan(request.getRatePlanId());
-    
-        // ✅ Validate linkage
-        productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
-    
+        // Validate only when provided (allow nulls end-to-end)
+        if (request.getCustomerId() != null) {
+            customerServiceClient.validateCustomer(request.getCustomerId());
+        }
+        if (request.getProductId() != null) {
+            productRatePlanClient.validateProduct(request.getProductId());
+        }
+        if (request.getRatePlanId() != null) {
+            productRatePlanClient.validateRatePlan(request.getRatePlanId());
+        }
+        if (request.getProductId() != null && request.getRatePlanId() != null) {
+            productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
+        }
+        
         Subscription subscription = mapper.toEntity(request);
         return mapper.toResponse(repository.save(subscription));
     }
@@ -63,10 +79,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionResponse updateSubscription(Long subscriptionId, SubscriptionUpdateRequest request) {
         Subscription subscription = repository.findById(subscriptionId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
 
+        // Validate present fields only (PATCH semantics)
+        if (request.getCustomerId() != null) {
+            customerServiceClient.validateCustomer(request.getCustomerId());
+        }
+        if (request.getProductId() != null) {
+            productRatePlanClient.validateProduct(request.getProductId());
+        }
+        if (request.getRatePlanId() != null) {
+            productRatePlanClient.validateRatePlan(request.getRatePlanId());
+        }
+        if (request.getProductId() != null && request.getRatePlanId() != null) {
+            productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
+        }
 
-        // ✅ Delegate field updates (including paymentType) to mapper
+        // Apply updates
         mapper.updateEntityFromRequest(request, subscription);
 
         return mapper.toResponse(repository.save(subscription));

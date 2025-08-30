@@ -18,8 +18,8 @@ public class SubscriptionAssembler {
                 .ratePlanId(entity.getRatePlanId())
 
                 .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdOn(entity.getCreatedOn())
+                .lastUpdated(entity.getLastUpdated())
                 .adminNotes(entity.getAdminNotes())
                 .build();
     }

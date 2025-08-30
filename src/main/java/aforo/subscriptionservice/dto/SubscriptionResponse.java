@@ -19,9 +19,9 @@ public class SubscriptionResponse {
     private Long productId;
     private Long ratePlanId;
     private SubscriptionStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-private PaymentType paymentType;
+    private LocalDateTime createdOn;
+    private LocalDateTime lastUpdated;
+    private PaymentType paymentType;
 
     private String adminNotes;
 }
