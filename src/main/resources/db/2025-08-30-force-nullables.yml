@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-08-30-01-force-nullables
+      author: gowtham
+      changes:
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            stripComments: true
+            sql: |
+              ALTER TABLE public.subscription
+                ALTER COLUMN customer_id   DROP NOT NULL,
+                ALTER COLUMN product_id    DROP NOT NULL,
+                ALTER COLUMN rate_plan_id  DROP NOT NULL,
+                ALTER COLUMN status        DROP NOT NULL,
+                ALTER COLUMN start_date    DROP NOT NULL,
+                ALTER COLUMN end_date      DROP NOT NULL,
+                ALTER COLUMN payment_type  DROP NOT NULL;
