@@ -54,7 +54,10 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/api/health").permitAll()
+                        "/api/health",
+                        "/actuator/health",
+                        "/actuator/health/**",
+                        "/actuator/info").permitAll()
                 // Allow preflight requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // All subscription APIs need JWT
