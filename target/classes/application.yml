@@ -31,6 +31,22 @@ logging:
     org.springframework.web.reactive.function.client: DEBUG
     aforo.subscriptionservice: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
 aforo:
   jwt:
     issuer: aforo-billablemetrics
