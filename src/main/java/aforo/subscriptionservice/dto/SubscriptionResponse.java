@@ -24,4 +24,8 @@ public class SubscriptionResponse {
     private PaymentType paymentType;
 
     private String adminNotes;
+    private String customerName;
+    private String productName;
+    private String ratePlanName;
+    private Long organizationId;
 }

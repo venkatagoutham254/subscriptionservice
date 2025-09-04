@@ -58,6 +58,7 @@ public class SubscriptionMapper {
                 .createdOn(entity.getCreatedOn())
                 .lastUpdated(entity.getLastUpdated())
                 .adminNotes(entity.getAdminNotes())
+                .organizationId(entity.getOrganizationId())
                 .build();
     }
 }

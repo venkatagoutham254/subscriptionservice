@@ -1,6 +1,5 @@
 package aforo.subscriptionservice.client.dto;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,4 +8,5 @@ import lombok.Setter;
 public class RatePlanDTO {
     private Long ratePlanId;
     private Long productId;
+    private String ratePlanName;
 }
