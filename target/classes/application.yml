@@ -1,13 +1,13 @@
 server:
-  port: 8084
+  port: ${SERVER_PORT:8084}
 
 spring:
   application:
     name: subscription-service
   datasource:
-    url: jdbc:postgresql://localhost:5436/subscriptiondb
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/subscriptiondb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update  # ✅ enables auto table creation in dev
@@ -24,7 +24,7 @@ spring:
 
 product:
   service:
-    base-url: http://54.238.204.246:8080  # Replace with actual URL if needed
+    base-url: ${PRODUCT_SERVICE_BASE_URL:http://54.238.204.246:8080}
 
 logging:
   level:
