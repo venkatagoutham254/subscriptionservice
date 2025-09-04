@@ -2,6 +2,9 @@ package aforo.subscriptionservice.service.impl;
 
 import aforo.subscriptionservice.client.CustomerServiceClient;
 import aforo.subscriptionservice.client.ProductRatePlanClient;
+import aforo.subscriptionservice.client.dto.CustomerDTO;
+import aforo.subscriptionservice.client.dto.ProductDTO;
+import aforo.subscriptionservice.client.dto.RatePlanDTO;
 import aforo.subscriptionservice.dto.SubscriptionCreateRequest;
 import aforo.subscriptionservice.dto.SubscriptionResponse;
 import aforo.subscriptionservice.dto.SubscriptionUpdateRequest;
@@ -10,6 +13,7 @@ import aforo.subscriptionservice.mapper.SubscriptionMapper;
 import aforo.subscriptionservice.repository.SubscriptionRepository;
 import aforo.subscriptionservice.service.SubscriptionService;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
+import aforo.subscriptionservice.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +33,34 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final ProductRatePlanClient productRatePlanClient;
     private final CustomerServiceClient customerServiceClient;
 
+    private SubscriptionResponse enrich(Subscription subscription) {
+        SubscriptionResponse resp = mapper.toResponse(subscription);
+        try {
+            if (subscription.getCustomerId() != null) {
+                CustomerDTO c = customerServiceClient.getCustomer(subscription.getCustomerId());
+                if (c != null) resp.setCustomerName(c.getCustomerName());
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (subscription.getProductId() != null) {
+                ProductDTO p = productRatePlanClient.getProduct(subscription.getProductId());
+                if (p != null) resp.setProductName(p.getProductName());
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (subscription.getRatePlanId() != null) {
+                RatePlanDTO rp = productRatePlanClient.getRatePlan(subscription.getRatePlanId());
+                if (rp != null) resp.setRatePlanName(rp.getRatePlanName());
+            }
+        } catch (Exception ignored) {}
+        return resp;
+    }
 
     @Override
     public SubscriptionResponse confirmSubscription(Long subscriptionId) {
-        Subscription subscription = repository.findById(subscriptionId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+        Long orgId = TenantContext.require();
+        Subscription subscription = repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
 
         // Validate required fields before activation
         StringBuilder missing = new StringBuilder();
@@ -53,10 +80,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscription.setLastUpdated(LocalDateTime.now());
             subscription = repository.save(subscription);
         }
-        return mapper.toResponse(subscription);
+        return enrich(subscription);
     }
+
     @Override
     public SubscriptionResponse createSubscription(SubscriptionCreateRequest request) {
+        Long orgId = TenantContext.require();
         // Validate only when provided (allow nulls end-to-end)
         if (request.getCustomerId() != null) {
             customerServiceClient.validateCustomer(request.getCustomerId());
@@ -70,15 +99,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (request.getProductId() != null && request.getRatePlanId() != null) {
             productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
         }
-        
+
         Subscription subscription = mapper.toEntity(request);
-        return mapper.toResponse(repository.save(subscription));
+        subscription.setOrganizationId(orgId);
+        return enrich(repository.save(subscription));
     }
-    
 
     @Override
     public SubscriptionResponse updateSubscription(Long subscriptionId, SubscriptionUpdateRequest request) {
-        Subscription subscription = repository.findById(subscriptionId)
+        Long orgId = TenantContext.require();
+        Subscription subscription = repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
 
         // Validate present fields only (PATCH semantics)
@@ -98,31 +128,32 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Apply updates
         mapper.updateEntityFromRequest(request, subscription);
 
-        return mapper.toResponse(repository.save(subscription));
+        return enrich(repository.save(subscription));
     }
 
     @Override
     public SubscriptionResponse getSubscription(Long subscriptionId) {
-        return repository.findById(subscriptionId)
-                .map(mapper::toResponse)
+        Long orgId = TenantContext.require();
+        return repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
+                .map(this::enrich)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
-
     }
 
     @Override
     public List<SubscriptionResponse> findAll() {
-        return repository.findAll()
+        Long orgId = TenantContext.require();
+        return repository.findByOrganizationId(orgId)
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::enrich)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void delete(Long subscriptionId) {
-        if (!repository.existsById(subscriptionId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found");
-        }
-        repository.deleteById(subscriptionId);
+        Long orgId = TenantContext.require();
+        Subscription s = repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+        repository.delete(s);
     }
 }

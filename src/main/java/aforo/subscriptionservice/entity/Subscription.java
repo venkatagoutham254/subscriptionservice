@@ -31,6 +31,8 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
+    @Column(name = "organization_id")
+    private Long organizationId;
 
     @Column(name = "created_on")
     private LocalDateTime createdOn;
@@ -38,12 +40,10 @@ public class Subscription {
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
 
-
     @Enumerated(EnumType.STRING)   // stores PREPAID/POSTPAID as text
     @Column(name = "payment_type")
     private PaymentType paymentType;
 
-    
     @Column(name = "admin_notes", length = 255)
     private String adminNotes;
 }
