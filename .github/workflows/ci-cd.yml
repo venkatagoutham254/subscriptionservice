@@ -40,11 +40,11 @@ jobs:
             docker-compose up --build -d
           EOF
 
-      - name: Wait for health check
+      - name: Wait for health check (public)
         run: |
-          echo "Waiting for http://${{ secrets.EC2_HOST }}:8084/actuator/health ..."
-          for i in {1..30}; do
-            if curl -fs http://${{ secrets.EC2_HOST }}:8084/actuator/health > /dev/null; then
+          echo "Waiting for http://${{ secrets.EC2_HOST }}:8084/api/health ..."
+          for i in {1..60}; do
+            if curl -fs http://${{ secrets.EC2_HOST }}:8084/api/health > /dev/null; then
               echo "✅ Service is up!" && exit 0
             fi
             sleep 5
