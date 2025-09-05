@@ -1,13 +1,13 @@
 server:
-  port: ${SERVER_PORT:8084}
+  port: 8084
 
 spring:
   application:
     name: subscription-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/subscriptiondb}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: jdbc:postgresql://localhost:5436/subscriptiondb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update  # ✅ enables auto table creation in dev
@@ -24,28 +24,12 @@ spring:
 
 product:
   service:
-    base-url: ${PRODUCT_SERVICE_BASE_URL:http://54.238.204.246:8080}
+    base-url: http://54.238.204.246:8080  # Replace with actual URL if needed
 
 logging:
   level:
     org.springframework.web.reactive.function.client: DEBUG
     aforo.subscriptionservice: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info"
-  endpoint:
-    health:
-      probes:
-        enabled: true
-      show-details: never
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true
 
 aforo:
   jwt:
@@ -59,3 +43,4 @@ aforo:
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-headers: "Authorization,Content-Type,X-Organization-Id"
     allow-credentials: true
+
