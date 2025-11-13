@@ -16,11 +16,12 @@ public class SubscriptionAssembler {
                 .customerId(entity.getCustomerId()) // UUID
                 .productId(entity.getProductId())
                 .ratePlanId(entity.getRatePlanId())
-
+                .paymentType(entity.getPaymentType())
                 .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdOn(entity.getCreatedOn())
+                .lastUpdated(entity.getLastUpdated())
                 .adminNotes(entity.getAdminNotes())
+                
                 .build();
     }
 }

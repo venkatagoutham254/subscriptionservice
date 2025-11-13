@@ -19,8 +19,8 @@ public class SubscriptionMapper {
                 .ratePlanId(request.getRatePlanId())
                 .paymentType(request.getPaymentType())
                 .status(SubscriptionStatus.DRAFT)   // default status on create
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdOn(LocalDateTime.now())
+                .lastUpdated(LocalDateTime.now())
                 .adminNotes(request.getAdminNotes())
                 .build();
     }
@@ -29,13 +29,22 @@ public class SubscriptionMapper {
         if (request.getPaymentType() != null) {
             entity.setPaymentType(request.getPaymentType());
         }
+        if (request.getCustomerId() != null) {
+            entity.setCustomerId(request.getCustomerId());
+        }
+        if (request.getProductId() != null) {
+            entity.setProductId(request.getProductId());
+        }
+        if (request.getRatePlanId() != null) {
+            entity.setRatePlanId(request.getRatePlanId());
+        }
         if (request.getStatus() != null) {
             entity.setStatus(request.getStatus());
         }
         if (request.getAdminNotes() != null) {
             entity.setAdminNotes(request.getAdminNotes());
         }
-        entity.setUpdatedAt(LocalDateTime.now());
+        entity.setLastUpdated(LocalDateTime.now());
     }
 
     public SubscriptionResponse toResponse(Subscription entity) {
@@ -46,9 +55,10 @@ public class SubscriptionMapper {
                 .ratePlanId(entity.getRatePlanId())
                 .paymentType(entity.getPaymentType())
                 .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdOn(entity.getCreatedOn())
+                .lastUpdated(entity.getLastUpdated())
                 .adminNotes(entity.getAdminNotes())
+                .organizationId(entity.getOrganizationId())
                 .build();
     }
 }

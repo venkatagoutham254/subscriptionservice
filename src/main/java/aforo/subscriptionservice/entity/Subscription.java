@@ -19,27 +19,31 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subscriptionId;
 
-    private Long customerId; // Changed from Integer to UUID
+    @Column(name = "customer_id")
+    private Long customerId;
 
+    @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "rate_plan_id")
     private Long ratePlanId;
 
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
+    @Column(name = "organization_id")
+    private Long organizationId;
 
-    private LocalDateTime createdAt;
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
 
-    private LocalDateTime updatedAt;
-
-
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
 
     @Enumerated(EnumType.STRING)   // stores PREPAID/POSTPAID as text
-    @Column(nullable = false)      // required field
+    @Column(name = "payment_type")
     private PaymentType paymentType;
 
-    
-    @Column(length = 255)
+    @Column(name = "admin_notes", length = 255)
     private String adminNotes;
 }

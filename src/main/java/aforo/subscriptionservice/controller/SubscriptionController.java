@@ -6,6 +6,9 @@ import aforo.subscriptionservice.dto.SubscriptionUpdateRequest;
 import aforo.subscriptionservice.service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +39,16 @@ public class SubscriptionController {
     @PostMapping("/{subscriptionId}/confirm")
     public ResponseEntity<SubscriptionResponse> confirm(@PathVariable Long subscriptionId) {
         return ResponseEntity.ok(subscriptionService.confirmSubscription(subscriptionId));
+    }
+
+    @GetMapping
+    public List<SubscriptionResponse> getAll() {
+        return subscriptionService.findAll();
+    }
+
+    @DeleteMapping("/{subscriptionId}")
+    public ResponseEntity<Void> delete(@PathVariable Long subscriptionId) {
+        subscriptionService.delete(subscriptionId);
+        return ResponseEntity.noContent().build(); // 204
     }
 }

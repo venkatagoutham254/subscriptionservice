@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog-subscription.yml
+  - include:
+      file: db/2025-08-30-subscription-safe.yml
+  - include:
+      file: db/2025-08-30-force-nullables.yml

@@ -1,0 +1,154 @@
+databaseChangeLog:
+
+  # --- Safe renames: only run if old column still exists ---
+  - changeSet:
+      id: 2025-08-30-01-rename-created_at-to-created_on
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - columnExists:
+            tableName: subscription
+            columnName: created_at
+      changes:
+        - renameColumn:
+            tableName: subscription
+            oldColumnName: created_at
+            newColumnName: created_on
+            columnDataType: TIMESTAMP
+
+  - changeSet:
+      id: 2025-08-30-02-rename-updated_at-to-last_updated
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - columnExists:
+            tableName: subscription
+            columnName: updated_at
+      changes:
+        - renameColumn:
+            tableName: subscription
+            oldColumnName: updated_at
+            newColumnName: last_updated
+            columnDataType: TIMESTAMP
+
+  # --- Relax NOT NULL: run only if column is currently NOT NULL ---
+  - changeSet:
+      id: 2025-08-30-03-nullable-customer_id
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='customer_id' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: customer_id
+            columnDataType: Long
+
+  - changeSet:
+      id: 2025-08-30-04-nullable-product_id
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='product_id' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: product_id
+            columnDataType: Long
+
+  - changeSet:
+      id: 2025-08-30-05-nullable-rate_plan_id
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='rate_plan_id' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: rate_plan_id
+            columnDataType: Long
+
+  - changeSet:
+      id: 2025-08-30-06-nullable-status
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='status' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: status
+            columnDataType: VARCHAR(20)
+
+  - changeSet:
+      id: 2025-08-30-07-nullable-start_date
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='start_date' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: start_date
+            columnDataType: TIMESTAMP
+
+  - changeSet:
+      id: 2025-08-30-08-nullable-end_date
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='end_date' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: end_date
+            columnDataType: TIMESTAMP
+
+  - changeSet:
+      id: 2025-08-30-09-nullable-payment_type
+      author: gowtham
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        - sqlCheck:
+            expectedResult: 1
+            sql: >
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name='subscription' AND column_name='payment_type' AND is_nullable='NO'
+      changes:
+        - dropNotNullConstraint:
+            tableName: subscription
+            columnName: payment_type
+            columnDataType: VARCHAR(20)
