@@ -13,7 +13,7 @@ public class ProductRatePlanClient {
     private final WebClient webClient;
 
     public ProductRatePlanClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://54.238.204.246:8080").build();
+        this.webClient = builder.baseUrl("http://3.208.93.68:8080").build();
     }
 
     public void validateProduct(Long id) {
