@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -28,6 +26,10 @@ services:
     networks:
       - db-network
     restart: always
+
+networks:
+  db-network:
+    driver: bridge
 
 volumes:
   pgdata:
