@@ -1,37 +1,33 @@
 version: '3.8'
 
 services:
-  subscription-service:
-    build: .
-    container_name: subscription-service
-    ports:
-      - "8084:8084"
-    depends_on:
-      - subscriptiondb
-    environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_DATASOURCE_URL: jdbc:postgresql://subscriptiondb:5432/subscriptiondb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    networks:
-      - aforo-network
-
-  subscriptiondb:
-    image: postgres:14
-    container_name: subscriptiondb
+  postgres:
+    image: postgres:15
+    container_name: subscription_postgres
     environment:
       POSTGRES_DB: subscriptiondb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5436:5432" # External:Internal (optional)
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "5436:5432"
     networks:
-      - aforo-network
+      - db-network
+    restart: always
 
-networks:
-  aforo-network:
+  app:
+    build: .
+    container_name: subscription_service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/subscriptiondb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - postgres
+    networks:
+      - db-network
+    restart: always
 
 volumes:
   pgdata:
