@@ -23,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://54.238.204.246",
                         "http://18.182.19.181",
                         "http://54.221.164.5",
+                        "http://52.90.125.218:8080",
                         "http://aforo.space",
                         "https://aforo.space"
 
