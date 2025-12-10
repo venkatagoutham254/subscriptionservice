@@ -27,5 +27,6 @@ public class SubscriptionResponse {
     private String customerName;
     private String productName;
     private String ratePlanName;
+    private String ratePlanType;
     private Long organizationId;
 }
