@@ -50,7 +50,33 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         try {
             if (subscription.getRatePlanId() != null) {
                 RatePlanDTO rp = productRatePlanClient.getRatePlan(subscription.getRatePlanId());
-                if (rp != null) resp.setRatePlanName(rp.getRatePlanName());
+                if (rp != null) {
+                    resp.setRatePlanName(rp.getRatePlanName());
+
+                    String ratePlanType = rp.getRatePlanType();
+
+                    if (ratePlanType == null) {
+                        if (rp.getUsageBasedPricings() != null && !rp.getUsageBasedPricings().isEmpty()
+                                && rp.getUsageBasedPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getUsageBasedPricings().get(0).getRatePlanType();
+                        } else if (rp.getTieredPricings() != null && !rp.getTieredPricings().isEmpty()
+                                && rp.getTieredPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getTieredPricings().get(0).getRatePlanType();
+                        } else if (rp.getVolumePricings() != null && !rp.getVolumePricings().isEmpty()
+                                && rp.getVolumePricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getVolumePricings().get(0).getRatePlanType();
+                        } else if (rp.getStairStepPricings() != null && !rp.getStairStepPricings().isEmpty()
+                                && rp.getStairStepPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getStairStepPricings().get(0).getRatePlanType();
+                        } else if (rp.getFlatFee() != null && rp.getFlatFee().getRatePlanType() != null) {
+                            ratePlanType = rp.getFlatFee().getRatePlanType();
+                        }
+                    }
+
+                    if (ratePlanType != null) {
+                        resp.setRatePlanType(ratePlanType);
+                    }
+                }
             }
         } catch (Exception ignored) {}
         return resp;
