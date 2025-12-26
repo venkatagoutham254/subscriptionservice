@@ -7,8 +7,10 @@ import aforo.subscriptionservice.service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,5 +52,27 @@ public class SubscriptionController {
     public ResponseEntity<Void> delete(@PathVariable Long subscriptionId) {
         subscriptionService.delete(subscriptionId);
         return ResponseEntity.noContent().build(); // 204
+    }
+
+    // ========== BILLING CYCLE ENDPOINTS FOR METERING SERVICE ==========
+
+    /**
+     * Get subscriptions with billing periods ending by specific timestamp
+     * Used by Metering Service scheduler to find subscriptions needing invoicing
+     */
+    @GetMapping("/ending-by")
+    public ResponseEntity<List<SubscriptionResponse>> getSubscriptionsEndingBy(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime timestamp) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionsEndingBy(timestamp));
+    }
+
+    /**
+     * Move subscription to next billing period after invoice is generated
+     * Called by Metering Service after creating invoice
+     */
+    @PatchMapping("/{subscriptionId}/advance-billing-period")
+    public ResponseEntity<SubscriptionResponse> advanceBillingPeriod(
+            @PathVariable Long subscriptionId) {
+        return ResponseEntity.ok(subscriptionService.advanceBillingPeriod(subscriptionId));
     }
 }

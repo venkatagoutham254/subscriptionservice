@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-billing-cycle-tracking
+      author: aforo.ai
+      changes:
+        # Add billing cycle tracking columns with TIMESTAMP precision
+        - addColumn:
+            tableName: subscription
+            columns:
+              - column:
+                  name: current_billing_period_start
+                  type: TIMESTAMP
+                  remarks: "Start timestamp of current billing period (from createdOn)"
+              - column:
+                  name: current_billing_period_end
+                  type: TIMESTAMP
+                  remarks: "End timestamp of current billing period (based on frequency)"
+              - column:
+                  name: next_billing_timestamp
+                  type: TIMESTAMP
+                  remarks: "Timestamp when next billing cycle starts"
+              - column:
+                  name: billing_anchor_info
+                  type: VARCHAR(100)
+                  remarks: "Human-readable billing schedule description"
+              - column:
+                  name: auto_renew
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  remarks: "Whether subscription auto-renews at billing period end"
+
+        # Create index for scheduler queries (find subscriptions where billing period has ended)
+        - createIndex:
+            indexName: idx_subscription_billing_end_status
+            tableName: subscription
+            columns:
+              - column:
+                  name: current_billing_period_end
+              - column:
+                  name: status
+            remarks: "Index for efficient billing cycle scheduler queries"

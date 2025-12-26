@@ -59,6 +59,12 @@ public class SubscriptionMapper {
                 .lastUpdated(entity.getLastUpdated())
                 .adminNotes(entity.getAdminNotes())
                 .organizationId(entity.getOrganizationId())
+                // Billing cycle fields
+                .currentBillingPeriodStart(entity.getCurrentBillingPeriodStart())
+                .currentBillingPeriodEnd(entity.getCurrentBillingPeriodEnd())
+                .nextBillingTimestamp(entity.getNextBillingTimestamp())
+                .billingAnchorInfo(entity.getBillingAnchorInfo())
+                .autoRenew(entity.getAutoRenew())
                 .build();
     }
 }

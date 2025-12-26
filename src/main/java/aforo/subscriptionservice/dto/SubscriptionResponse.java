@@ -29,4 +29,12 @@ public class SubscriptionResponse {
     private String ratePlanName;
     private String ratePlanType;
     private Long organizationId;
+
+    // Billing cycle fields
+    private LocalDateTime currentBillingPeriodStart;
+    private LocalDateTime currentBillingPeriodEnd;
+    private LocalDateTime nextBillingTimestamp;
+    private String billingAnchorInfo;
+    private Boolean autoRenew;
+    private String billingFrequency;  // Enriched from rate plan
 }
