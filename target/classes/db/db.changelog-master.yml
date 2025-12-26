@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/2025-08-30-subscription-safe.yml
   - include:
       file: db/2025-08-30-force-nullables.yml
+  - include:
+      file: db/2025-12-23-add-billing-cycle-tracking.yml

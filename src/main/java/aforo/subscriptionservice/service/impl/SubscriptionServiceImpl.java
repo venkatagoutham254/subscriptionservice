@@ -76,6 +76,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     if (ratePlanType != null) {
                         resp.setRatePlanType(ratePlanType);
                     }
+                    // Enrich with billing frequency
+                    if (rp.getBillingFrequency() != null) {
+                        resp.setBillingFrequency(rp.getBillingFrequency());
+                    }
                 }
             }
         } catch (Exception ignored) {}
@@ -112,6 +116,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionResponse createSubscription(SubscriptionCreateRequest request) {
         Long orgId = TenantContext.require();
+        
         // Validate only when provided (allow nulls end-to-end)
         if (request.getCustomerId() != null) {
             customerServiceClient.validateCustomer(request.getCustomerId());
@@ -119,16 +124,37 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (request.getProductId() != null) {
             productRatePlanClient.validateProduct(request.getProductId());
         }
+        
+        // Fetch rate plan if ratePlanId is provided (validate and extract billing frequency)
+        RatePlanDTO ratePlan = null;
+        String billingFrequency = null;
+        
         if (request.getRatePlanId() != null) {
-            productRatePlanClient.validateRatePlan(request.getRatePlanId());
-        }
-        if (request.getProductId() != null && request.getRatePlanId() != null) {
-            productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
+            // Fetch rate plan - this validates it exists and gives us billing frequency
+            ratePlan = productRatePlanClient.getRatePlan(request.getRatePlanId());
+            billingFrequency = ratePlan.getBillingFrequency();
+            
+            // Validate product-rateplan linkage if both are provided
+            if (request.getProductId() != null) {
+                productRatePlanClient.validateProductRatePlanLinkage(request.getProductId(), request.getRatePlanId());
+            }
         }
 
+        // Create subscription entity
         Subscription subscription = mapper.toEntity(request);
         subscription.setOrganizationId(orgId);
-        return enrich(repository.save(subscription));
+        subscription.setAutoRenew(true);  // Default to auto-renew
+        
+        // Save first to get createdOn timestamp populated
+        subscription = repository.save(subscription);
+        
+        // Calculate and set billing cycle using billing frequency from rate plan
+        if (billingFrequency != null && !billingFrequency.isBlank()) {
+            calculateAndSetBillingCycle(subscription, billingFrequency);
+            subscription = repository.save(subscription);
+        }
+        
+        return enrich(subscription);
     }
 
     @Override
@@ -181,5 +207,114 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Subscription s = repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
         repository.delete(s);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SubscriptionResponse> getSubscriptionsEndingBy(LocalDateTime timestamp) {
+        // Query subscriptions ending by timestamp (used by Metering Service scheduler)
+        List<Subscription> subscriptions = repository.findSubscriptionsEndingByTimestamp(
+            timestamp,
+            SubscriptionStatus.ACTIVE
+        );
+        
+        return subscriptions.stream()
+            .map(this::enrich)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public SubscriptionResponse advanceBillingPeriod(Long subscriptionId) {
+        Long orgId = TenantContext.require();
+        
+        Subscription subscription = repository.findBySubscriptionIdAndOrganizationId(subscriptionId, orgId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+
+        // Fetch rate plan to get billing frequency
+        RatePlanDTO ratePlan = productRatePlanClient.getRatePlan(subscription.getRatePlanId());
+        String billingFrequency = ratePlan.getBillingFrequency();
+        
+        if (billingFrequency == null || billingFrequency.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "Rate plan does not have billing frequency configured");
+        }
+
+        // Calculate next billing period using frequency from rate plan
+        LocalDateTime newStart = subscription.getCurrentBillingPeriodEnd().plusSeconds(1);
+        LocalDateTime newEnd = calculatePeriodEnd(newStart, billingFrequency);
+        LocalDateTime newNext = newEnd.plusSeconds(1);
+
+        // Update subscription
+        subscription.setCurrentBillingPeriodStart(newStart);
+        subscription.setCurrentBillingPeriodEnd(newEnd);
+        subscription.setNextBillingTimestamp(newNext);
+        subscription.setLastUpdated(LocalDateTime.now());
+
+        subscription = repository.save(subscription);
+        
+        return enrich(subscription);
+    }
+
+    // ========== BILLING CYCLE CALCULATION METHODS ==========
+
+    /**
+     * Calculate and set billing cycle fields based on subscription's createdOn timestamp
+     * and the billing frequency from rate plan (received as String from Product Service)
+     */
+    private void calculateAndSetBillingCycle(Subscription subscription, String billingFrequency) {
+        // Extract timestamp from createdOn (set by mapper during entity creation)
+        LocalDateTime subscriptionStart = subscription.getCreatedOn();
+        if (subscriptionStart == null) {
+            subscriptionStart = LocalDateTime.now();
+        }
+
+        // Validate billing frequency
+        if (billingFrequency == null || billingFrequency.isBlank()) {
+            billingFrequency = "MONTHLY";  // Default to MONTHLY if not provided
+        }
+
+        // Calculate period end based on frequency
+        LocalDateTime billingPeriodEnd = calculatePeriodEnd(subscriptionStart, billingFrequency);
+        LocalDateTime nextBillingTime = billingPeriodEnd.plusSeconds(1);
+
+        // Generate human-readable anchor info
+        String anchorInfo = generateBillingAnchorInfo(subscriptionStart, billingFrequency);
+
+        // Set all billing cycle fields
+        subscription.setCurrentBillingPeriodStart(subscriptionStart);
+        subscription.setCurrentBillingPeriodEnd(billingPeriodEnd);
+        subscription.setNextBillingTimestamp(nextBillingTime);
+        subscription.setBillingAnchorInfo(anchorInfo);
+    }
+
+    /**
+     * Calculate period end timestamp for all billing frequencies
+     * Uses String frequency from Product/RatePlan Service
+     */
+    private LocalDateTime calculatePeriodEnd(LocalDateTime start, String frequency) {
+        return switch (frequency.toUpperCase()) {
+            case "HOURLY" -> start.plusHours(1).minusSeconds(1);
+            case "DAILY" -> start.plusDays(1).minusSeconds(1);
+            case "WEEKLY" -> start.plusWeeks(1).minusSeconds(1);
+            case "MONTHLY" -> start.plusMonths(1).minusSeconds(1);
+            case "YEARLY" -> start.plusYears(1).minusSeconds(1);
+            default -> start.plusMonths(1).minusSeconds(1);  // Default to MONTHLY
+        };
+    }
+
+    /**
+     * Generate human-readable billing schedule description
+     * Uses String frequency from Product/RatePlan Service
+     */
+    private String generateBillingAnchorInfo(LocalDateTime start, String frequency) {
+        return switch (frequency.toUpperCase()) {
+            case "HOURLY" -> "Every hour at " + start.getMinute() + " minutes past";
+            case "DAILY" -> "Daily at " + start.toLocalTime();
+            case "WEEKLY" -> "Weekly on " + start.getDayOfWeek() + " at " + start.toLocalTime();
+            case "MONTHLY" -> "Monthly on day " + start.getDayOfMonth() + " at " + start.toLocalTime();
+            case "YEARLY" -> "Yearly on " + start.getMonth() + " " + start.getDayOfMonth();
+            default -> "Monthly on day " + start.getDayOfMonth();  // Default fallback
+        };
     }
 }

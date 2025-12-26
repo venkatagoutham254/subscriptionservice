@@ -14,6 +14,7 @@ public class RatePlanDTO {
 	private Long productId;
 	private String ratePlanName;
 	private String ratePlanType;
+	private String billingFrequency;  // HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY
 
 	private FlatFeeDTO flatFee;
 	private List<VolumePricingDTO> volumePricings;
