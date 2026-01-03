@@ -2,34 +2,54 @@ services:
   postgres:
     image: postgres:15
     container_name: subscription_postgres
+    restart: always
     environment:
       POSTGRES_DB: subscriptiondb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5436:5432"
+    # NO PORT EXPOSURE - only accessible via internal Docker network
+    # This prevents internet exposure and security attacks
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - db-network
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d subscriptiondb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: subscription_service
+    restart: always
     ports:
       - "8084:8084"
     environment:
+      - SERVER_PORT=8084
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/subscriptiondb
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - db-network
-    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
 
 networks:
   db-network:
     driver: bridge
-
-volumes:
-  pgdata:
