@@ -21,12 +21,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
+
+    // IST timezone for consistent timestamp handling
+    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
 
     private final SubscriptionRepository repository;
     private final SubscriptionMapper mapper;
@@ -107,7 +112,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE) {
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setLastUpdated(LocalDateTime.now());
+            subscription.setLastUpdated(ZonedDateTime.now(IST_ZONE).toLocalDateTime());
             subscription = repository.save(subscription);
         }
         return enrich(subscription);
@@ -249,7 +254,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setCurrentBillingPeriodStart(newStart);
         subscription.setCurrentBillingPeriodEnd(newEnd);
         subscription.setNextBillingTimestamp(newNext);
-        subscription.setLastUpdated(LocalDateTime.now());
+        subscription.setLastUpdated(ZonedDateTime.now(IST_ZONE).toLocalDateTime());
 
         subscription = repository.save(subscription);
         
@@ -266,7 +271,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Extract timestamp from createdOn (set by mapper during entity creation)
         LocalDateTime subscriptionStart = subscription.getCreatedOn();
         if (subscriptionStart == null) {
-            subscriptionStart = LocalDateTime.now();
+            subscriptionStart = ZonedDateTime.now(IST_ZONE).toLocalDateTime();
         }
 
         // Validate billing frequency

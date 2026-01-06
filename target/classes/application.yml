@@ -24,7 +24,7 @@ spring:
 
 product:
   service:
-    base-url: http://54.238.204.246:8080  # Replace with actual URL if needed
+    base-url: http://3.208.93.68:8080
 
 logging:
   level:
