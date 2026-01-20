@@ -37,4 +37,8 @@ public class SubscriptionResponse {
     private String billingAnchorInfo;
     private Boolean autoRenew;
     private String billingFrequency;  // Enriched from rate plan
+    
+    // Billable metrics fields
+    private String billableUid;
+    private String usageCondition;
 }

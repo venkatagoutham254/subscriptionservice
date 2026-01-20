@@ -2,9 +2,11 @@ package aforo.subscriptionservice.service.impl;
 
 import aforo.subscriptionservice.client.CustomerServiceClient;
 import aforo.subscriptionservice.client.ProductRatePlanClient;
+import aforo.subscriptionservice.client.BillableMetricsClient;
 import aforo.subscriptionservice.client.dto.CustomerDTO;
 import aforo.subscriptionservice.client.dto.ProductDTO;
 import aforo.subscriptionservice.client.dto.RatePlanDTO;
+import aforo.subscriptionservice.client.dto.BillableMetricDTO;
 import aforo.subscriptionservice.dto.SubscriptionCreateRequest;
 import aforo.subscriptionservice.dto.SubscriptionResponse;
 import aforo.subscriptionservice.dto.SubscriptionUpdateRequest;
@@ -37,6 +39,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionMapper mapper;
     private final ProductRatePlanClient productRatePlanClient;
     private final CustomerServiceClient customerServiceClient;
+    private final BillableMetricsClient billableMetricsClient;
 
     private SubscriptionResponse enrich(Subscription subscription) {
         SubscriptionResponse resp = mapper.toResponse(subscription);
@@ -85,6 +88,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     if (rp.getBillingFrequency() != null) {
                         resp.setBillingFrequency(rp.getBillingFrequency());
                     }
+                }
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (subscription.getProductId() != null) {
+                List<BillableMetricDTO> billableMetrics = billableMetricsClient.getBillableMetricsByProduct(subscription.getProductId());
+                if (billableMetrics != null && !billableMetrics.isEmpty()) {
+                    BillableMetricDTO firstMetric = billableMetrics.get(0);
+                    resp.setBillableUid(firstMetric.getBillableUid());
+                    resp.setUsageCondition(firstMetric.getUsageCondition());
                 }
             }
         } catch (Exception ignored) {}

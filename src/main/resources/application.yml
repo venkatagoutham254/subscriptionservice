@@ -26,6 +26,10 @@ product:
   service:
     base-url: http://3.208.93.68:8080
 
+billable-metrics:
+  service:
+    base-url: http://54.146.189.144:8081
+
 logging:
   level:
     org.springframework.web.reactive.function.client: DEBUG
