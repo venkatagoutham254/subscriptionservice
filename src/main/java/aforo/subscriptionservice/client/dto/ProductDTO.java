@@ -8,4 +8,5 @@ import lombok.Setter;
 public class ProductDTO {
     private Long productId;
     private String productName;
+    private String icon;
 }

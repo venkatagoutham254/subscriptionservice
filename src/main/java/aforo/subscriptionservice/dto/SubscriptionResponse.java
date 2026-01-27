@@ -26,6 +26,7 @@ public class SubscriptionResponse {
     private String adminNotes;
     private String customerName;
     private String productName;
+    private String icon;
     private String ratePlanName;
     private String ratePlanType;
     private Long organizationId;
