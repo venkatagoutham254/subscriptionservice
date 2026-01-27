@@ -52,7 +52,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         try {
             if (subscription.getProductId() != null) {
                 ProductDTO p = productRatePlanClient.getProduct(subscription.getProductId());
-                if (p != null) resp.setProductName(p.getProductName());
+                if (p != null) {
+                    resp.setProductName(p.getProductName());
+                    resp.setIcon(p.getIcon());
+                }
             }
         } catch (Exception ignored) {}
         try {

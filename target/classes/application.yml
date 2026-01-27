@@ -24,11 +24,11 @@ spring:
 
 product:
   service:
-    base-url: http://3.208.93.68:8080
+    base-url: http://product.dev.aforo.space:8080
 
 billable-metrics:
   service:
-    base-url: http://54.146.189.144:8081
+    base-url: http://usage.dev.aforo.space:8081
 
 logging:
   level:
@@ -43,7 +43,7 @@ aforo:
   cors:
     # Comma-separated list; used by SecurityConfig.corsConfigurationSource()
     # Include your frontend origin(s). Add https variants if applicable.
-    allowed-origins: "http://52.90.125.218:8080,http://54.221.164.5,http://13.115.248.133,http://localhost:3000,http://aforo.space,https://aforo.space"
+    allowed-origins: "http://52.90.125.218:8080,http://54.221.164.5,http://13.115.248.133,http://localhost:3000,http://aforo.space,https://aforo.space,http://ui.dev.aforo.space,http://product.dev.aforo.space:8080,http://metering.dev.aforo.space:8092,http://usage.dev.aforo.space:8081,http://ingestion.dev.aforo.space:8088,http://kong.dev.aforo.space:8086,http://org.dev.aforo.space:8081,http://quickbooks.dev.aforo.space:8095,http://subscription.dev.aforo.space:8084"
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-headers: "Authorization,Content-Type,X-Organization-Id"
     allow-credentials: true
