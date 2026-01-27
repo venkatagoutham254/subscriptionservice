@@ -14,8 +14,8 @@ public class CustomerServiceClient {
     private final WebClient webClient;
 
     public CustomerServiceClient(WebClient.Builder builder) {
-        // ✅ Customer service base URL (updated AWS URL)
-        this.webClient = builder.baseUrl("http://44.201.19.187:8081/v1/api").build();
+        // ✅ Customer service base URL (Route53 domain)
+        this.webClient = builder.baseUrl("http://org.dev.aforo.space:8081/v1/api").build();
     }
 
     private String getBearerToken() {
