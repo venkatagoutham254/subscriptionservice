@@ -20,7 +20,7 @@ public class BillableMetricsClient {
     private final WebClient webClient;
 
     public BillableMetricsClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://54.146.189.144:8081").build();
+        this.webClient = builder.baseUrl("http://usage.dev.aforo.space:8081").build();
     }
 
     private String getBearerToken() {

@@ -25,8 +25,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://54.221.164.5",
                         "http://52.90.125.218:8080",
                         "http://aforo.space",
-                        "https://aforo.space"
-
+                        "https://aforo.space",
+                        "http://ui.dev.aforo.space",
+                        "http://product.dev.aforo.space:8080",
+                        "http://metering.dev.aforo.space:8092",
+                        "http://usage.dev.aforo.space:8081",
+                        "http://ingestion.dev.aforo.space:8088",
+                        "http://kong.dev.aforo.space:8086",
+                        "http://org.dev.aforo.space:8081",
+                        "http://quickbooks.dev.aforo.space:8095",
+                        "http://subscription.dev.aforo.space:8084"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH")
                 .allowedHeaders("*")

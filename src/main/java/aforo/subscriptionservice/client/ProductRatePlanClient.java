@@ -16,7 +16,7 @@ public class ProductRatePlanClient {
     private final WebClient webClient;
 
     public ProductRatePlanClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://3.208.93.68:8080").build();
+        this.webClient = builder.baseUrl("http://product.dev.aforo.space:8080").build();
     }
 
     private String getBearerToken() {
