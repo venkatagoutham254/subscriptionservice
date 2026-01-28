@@ -42,4 +42,6 @@ public class SubscriptionResponse {
     // Billable metrics fields
     private String billableUid;
     private String usageCondition;
+    private String unitOfMeasure;
+    private String billingCriteria;
 }

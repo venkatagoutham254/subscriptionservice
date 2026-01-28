@@ -101,6 +101,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     BillableMetricDTO firstMetric = billableMetrics.get(0);
                     resp.setBillableUid(firstMetric.getBillableUid());
                     resp.setUsageCondition(firstMetric.getUsageCondition());
+                    resp.setUnitOfMeasure(firstMetric.getUnitOfMeasure());
+                    resp.setBillingCriteria(firstMetric.getBillingCriteria());
                 }
             }
         } catch (Exception ignored) {}
