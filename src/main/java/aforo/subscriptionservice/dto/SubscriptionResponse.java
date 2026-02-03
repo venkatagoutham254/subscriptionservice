@@ -6,7 +6,7 @@ import aforo.subscriptionservice.entity.PaymentType;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +19,8 @@ public class SubscriptionResponse {
     private Long productId;
     private Long ratePlanId;
     private SubscriptionStatus status;
-    private LocalDateTime createdOn;
-    private LocalDateTime lastUpdated;
+    private Instant createdOn;
+    private Instant lastUpdated;
     private PaymentType paymentType;
 
     private String adminNotes;
@@ -32,9 +32,9 @@ public class SubscriptionResponse {
     private Long organizationId;
 
     // Billing cycle fields
-    private LocalDateTime currentBillingPeriodStart;
-    private LocalDateTime currentBillingPeriodEnd;
-    private LocalDateTime nextBillingTimestamp;
+    private Instant currentBillingPeriodStart;
+    private Instant currentBillingPeriodEnd;
+    private Instant nextBillingTimestamp;
     private String billingAnchorInfo;
     private Boolean autoRenew;
     private String billingFrequency;  // Enriched from rate plan

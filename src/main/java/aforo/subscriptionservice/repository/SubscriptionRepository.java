@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import aforo.subscriptionservice.entity.Subscription;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
@@ -28,7 +28,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
            "AND s.status = :status " +
            "AND s.autoRenew = true")
     List<Subscription> findSubscriptionsEndingByTimestamp(
-        @Param("timestamp") LocalDateTime timestamp,
+        @Param("timestamp") Instant timestamp,
         @Param("status") SubscriptionStatus status
     );
 }

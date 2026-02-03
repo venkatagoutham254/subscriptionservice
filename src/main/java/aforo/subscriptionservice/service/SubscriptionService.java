@@ -6,7 +6,7 @@ import aforo.subscriptionservice.dto.SubscriptionCreateRequest;
 import aforo.subscriptionservice.dto.SubscriptionResponse;
 import aforo.subscriptionservice.dto.SubscriptionUpdateRequest;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public interface SubscriptionService {
     SubscriptionResponse createSubscription(SubscriptionCreateRequest request);
@@ -17,7 +17,7 @@ public interface SubscriptionService {
     void delete(Long subscriptionId);
 
     // Billing cycle operations for Metering Service
-    List<SubscriptionResponse> getSubscriptionsEndingBy(LocalDateTime timestamp);
+    List<SubscriptionResponse> getSubscriptionsEndingBy(Instant timestamp);
 
     SubscriptionResponse advanceBillingPeriod(Long subscriptionId);
 }

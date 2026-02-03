@@ -7,26 +7,21 @@ import aforo.subscriptionservice.entity.Subscription;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 @Component
 public class SubscriptionMapper {
 
-    // IST timezone for consistent timestamp handling
-    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
-
     public Subscription toEntity(SubscriptionCreateRequest request) {
-        LocalDateTime nowIST = ZonedDateTime.now(IST_ZONE).toLocalDateTime();
+        Instant now = Instant.now();
         return Subscription.builder()
                 .customerId(request.getCustomerId())
                 .productId(request.getProductId())
                 .ratePlanId(request.getRatePlanId())
                 .paymentType(request.getPaymentType())
                 .status(SubscriptionStatus.DRAFT)   // default status on create
-                .createdOn(nowIST)
-                .lastUpdated(nowIST)
+                .createdOn(now)
+                .lastUpdated(now)
                 .adminNotes(request.getAdminNotes())
                 .build();
     }
@@ -50,7 +45,7 @@ public class SubscriptionMapper {
         if (request.getAdminNotes() != null) {
             entity.setAdminNotes(request.getAdminNotes());
         }
-        entity.setLastUpdated(ZonedDateTime.now(IST_ZONE).toLocalDateTime());
+        entity.setLastUpdated(Instant.now());
     }
 
     public SubscriptionResponse toResponse(Subscription entity) {

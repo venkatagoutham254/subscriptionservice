@@ -22,9 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    // IST timezone for consistent timestamp handling
-    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
+    // UTC timezone for display formatting only
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     private final SubscriptionRepository repository;
     private final SubscriptionMapper mapper;
@@ -130,7 +131,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE) {
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setLastUpdated(ZonedDateTime.now(IST_ZONE).toLocalDateTime());
+            subscription.setLastUpdated(Instant.now());
             subscription = repository.save(subscription);
         }
         return enrich(subscription);
@@ -234,7 +235,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SubscriptionResponse> getSubscriptionsEndingBy(LocalDateTime timestamp) {
+    public List<SubscriptionResponse> getSubscriptionsEndingBy(Instant timestamp) {
         // Query subscriptions ending by timestamp (used by Metering Service scheduler)
         List<Subscription> subscriptions = repository.findSubscriptionsEndingByTimestamp(
             timestamp,
@@ -264,15 +265,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         // Calculate next billing period using frequency from rate plan
-        LocalDateTime newStart = subscription.getCurrentBillingPeriodEnd().plusSeconds(1);
-        LocalDateTime newEnd = calculatePeriodEnd(newStart, billingFrequency);
-        LocalDateTime newNext = newEnd.plusSeconds(1);
+        Instant newStart = subscription.getCurrentBillingPeriodEnd().plusSeconds(1);
+        Instant newEnd = calculatePeriodEnd(newStart, billingFrequency);
+        Instant newNext = newEnd.plusSeconds(1);
 
         // Update subscription
         subscription.setCurrentBillingPeriodStart(newStart);
         subscription.setCurrentBillingPeriodEnd(newEnd);
         subscription.setNextBillingTimestamp(newNext);
-        subscription.setLastUpdated(ZonedDateTime.now(IST_ZONE).toLocalDateTime());
+        subscription.setLastUpdated(Instant.now());
 
         subscription = repository.save(subscription);
         
@@ -287,9 +288,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      */
     private void calculateAndSetBillingCycle(Subscription subscription, String billingFrequency) {
         // Extract timestamp from createdOn (set by mapper during entity creation)
-        LocalDateTime subscriptionStart = subscription.getCreatedOn();
+        Instant subscriptionStart = subscription.getCreatedOn();
         if (subscriptionStart == null) {
-            subscriptionStart = ZonedDateTime.now(IST_ZONE).toLocalDateTime();
+            subscriptionStart = Instant.now();
         }
 
         // Validate billing frequency
@@ -298,8 +299,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         // Calculate period end based on frequency
-        LocalDateTime billingPeriodEnd = calculatePeriodEnd(subscriptionStart, billingFrequency);
-        LocalDateTime nextBillingTime = billingPeriodEnd.plusSeconds(1);
+        Instant billingPeriodEnd = calculatePeriodEnd(subscriptionStart, billingFrequency);
+        Instant nextBillingTime = billingPeriodEnd.plusSeconds(1);
 
         // Generate human-readable anchor info
         String anchorInfo = generateBillingAnchorInfo(subscriptionStart, billingFrequency);
@@ -315,14 +316,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      * Calculate period end timestamp for all billing frequencies
      * Uses String frequency from Product/RatePlan Service
      */
-    private LocalDateTime calculatePeriodEnd(LocalDateTime start, String frequency) {
+    private Instant calculatePeriodEnd(Instant start, String frequency) {
         return switch (frequency.toUpperCase()) {
-            case "HOURLY" -> start.plusHours(1).minusSeconds(1);
-            case "DAILY" -> start.plusDays(1).minusSeconds(1);
-            case "WEEKLY" -> start.plusWeeks(1).minusSeconds(1);
-            case "MONTHLY" -> start.plusMonths(1).minusSeconds(1);
-            case "YEARLY" -> start.plusYears(1).minusSeconds(1);
-            default -> start.plusMonths(1).minusSeconds(1);  // Default to MONTHLY
+            case "HOURLY" -> start.plus(1, ChronoUnit.HOURS).minusSeconds(1);
+            case "DAILY" -> start.plus(1, ChronoUnit.DAYS).minusSeconds(1);
+            case "WEEKLY" -> start.plus(7, ChronoUnit.DAYS).minusSeconds(1);
+            case "MONTHLY" -> start.plus(30, ChronoUnit.DAYS).minusSeconds(1);  // Approximate month
+            case "YEARLY" -> start.plus(365, ChronoUnit.DAYS).minusSeconds(1);  // Approximate year
+            default -> start.plus(30, ChronoUnit.DAYS).minusSeconds(1);  // Default to ~MONTHLY
         };
     }
 
@@ -330,14 +331,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      * Generate human-readable billing schedule description
      * Uses String frequency from Product/RatePlan Service
      */
-    private String generateBillingAnchorInfo(LocalDateTime start, String frequency) {
+    private String generateBillingAnchorInfo(Instant start, String frequency) {
+        // Convert Instant to ZonedDateTime for display formatting
+        ZonedDateTime zdt = start.atZone(UTC_ZONE);
         return switch (frequency.toUpperCase()) {
-            case "HOURLY" -> "Every hour at " + start.getMinute() + " minutes past";
-            case "DAILY" -> "Daily at " + start.toLocalTime();
-            case "WEEKLY" -> "Weekly on " + start.getDayOfWeek() + " at " + start.toLocalTime();
-            case "MONTHLY" -> "Monthly on day " + start.getDayOfMonth() + " at " + start.toLocalTime();
-            case "YEARLY" -> "Yearly on " + start.getMonth() + " " + start.getDayOfMonth();
-            default -> "Monthly on day " + start.getDayOfMonth();  // Default fallback
+            case "HOURLY" -> "Every hour at " + zdt.getMinute() + " minutes past";
+            case "DAILY" -> "Daily at " + zdt.toLocalTime();
+            case "WEEKLY" -> "Weekly on " + zdt.getDayOfWeek() + " at " + zdt.toLocalTime();
+            case "MONTHLY" -> "Monthly on day " + zdt.getDayOfMonth() + " at " + zdt.toLocalTime();
+            case "YEARLY" -> "Yearly on " + zdt.getMonth() + " " + zdt.getDayOfMonth();
+            default -> "Monthly on day " + zdt.getDayOfMonth();  // Default fallback
         };
     }
 }
