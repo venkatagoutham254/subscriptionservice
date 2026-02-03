@@ -5,7 +5,7 @@ import java.util.UUID;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -35,10 +35,10 @@ public class Subscription {
     private Long organizationId;
 
     @Column(name = "created_on")
-    private LocalDateTime createdOn;
+    private Instant createdOn;
 
     @Column(name = "last_updated")
-    private LocalDateTime lastUpdated;
+    private Instant lastUpdated;
 
     @Enumerated(EnumType.STRING)   // stores PREPAID/POSTPAID as text
     @Column(name = "payment_type")
@@ -51,10 +51,10 @@ public class Subscription {
     
     /**
      * Timestamp when current billing period started (extracted from createdOn)
-     * Example: 2025-12-23T15:14:00
+     * Example: 2025-12-23T15:14:00Z
      */
     @Column(name = "current_billing_period_start")
-    private LocalDateTime currentBillingPeriodStart;
+    private Instant currentBillingPeriodStart;
 
     /**
      * Timestamp when current billing period ends
@@ -66,13 +66,13 @@ public class Subscription {
      * For YEARLY: start + 1 year - 1 second
      */
     @Column(name = "current_billing_period_end")
-    private LocalDateTime currentBillingPeriodEnd;
+    private Instant currentBillingPeriodEnd;
 
     /**
      * Timestamp when next billing cycle starts (always = end + 1 second)
      */
     @Column(name = "next_billing_timestamp")
-    private LocalDateTime nextBillingTimestamp;
+    private Instant nextBillingTimestamp;
 
     /**
      * Human-readable billing schedule info for display

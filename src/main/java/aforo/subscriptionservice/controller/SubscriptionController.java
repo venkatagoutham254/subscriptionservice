@@ -7,7 +7,7 @@ import aforo.subscriptionservice.service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,7 +62,7 @@ public class SubscriptionController {
      */
     @GetMapping("/ending-by")
     public ResponseEntity<List<SubscriptionResponse>> getSubscriptionsEndingBy(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime timestamp) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant timestamp) {
         return ResponseEntity.ok(subscriptionService.getSubscriptionsEndingBy(timestamp));
     }
 
