@@ -48,6 +48,11 @@ public class SubscriptionController {
         return subscriptionService.findAll();
     }
 
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<SubscriptionResponse>> getByCustomerId(@PathVariable Long customerId) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionsByCustomerId(customerId));
+    }
+
     @DeleteMapping("/{subscriptionId}")
     public ResponseEntity<Void> delete(@PathVariable Long subscriptionId) {
         subscriptionService.delete(subscriptionId);
