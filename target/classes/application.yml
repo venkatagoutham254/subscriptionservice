@@ -17,8 +17,6 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yml
   jackson:
-    date-format: dd MMM, yyyy HH:mm z
-    time-zone: Asia/Kolkata
     serialization:
       write-dates-as-timestamps: false
 

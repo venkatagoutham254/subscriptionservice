@@ -16,6 +16,9 @@ public interface SubscriptionService {
     List<SubscriptionResponse> findAll();
     void delete(Long subscriptionId);
 
+    // Query subscriptions by customer
+    List<SubscriptionResponse> getSubscriptionsByCustomerId(Long customerId);
+
     // Billing cycle operations for Metering Service
     List<SubscriptionResponse> getSubscriptionsEndingBy(Instant timestamp);
 

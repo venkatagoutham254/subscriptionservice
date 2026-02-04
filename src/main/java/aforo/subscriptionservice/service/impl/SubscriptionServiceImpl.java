@@ -225,6 +225,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<SubscriptionResponse> getSubscriptionsByCustomerId(Long customerId) {
+        Long orgId = TenantContext.require();
+        return repository.findByCustomerIdAndOrganizationId(customerId, orgId)
+                .stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void delete(Long subscriptionId) {
         Long orgId = TenantContext.require();
