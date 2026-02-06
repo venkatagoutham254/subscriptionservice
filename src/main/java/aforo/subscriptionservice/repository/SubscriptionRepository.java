@@ -15,8 +15,7 @@ import java.util.List;
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
     java.util.Optional<Subscription> findBySubscriptionIdAndOrganizationId(Long subscriptionId, Long organizationId);
     java.util.List<Subscription> findByOrganizationId(Long organizationId);
-    java.util.List<Subscription> findByCustomerIdAndOrganizationId(Long customerId, Long organizationId);
-
+    
     /**
      * Find subscriptions where billing period has ended (or will end) by specific timestamp
      * Used by Metering Service scheduler to find subscriptions needing invoicing
