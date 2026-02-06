@@ -161,7 +161,6 @@ public class SubscriptionAnalyticsService {
 
     private boolean checkForOverdueRenewals(List<Subscription> subscriptions) {
         Instant now = Instant.now();
-        LocalDateTime now = LocalDateTime.now();
         return subscriptions.stream()
                 .anyMatch(s -> s.getNextBillingTimestamp() != null && 
                               s.getNextBillingTimestamp().isBefore(now) &&
