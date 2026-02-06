@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import aforo.subscriptionservice.entity.PaymentType;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.Instant;
@@ -24,11 +25,16 @@ public class SubscriptionResponse {
     private PaymentType paymentType;
 
     private String adminNotes;
+    
+    // Enriched fields from external services
+    // customerName is excluded when null to hide it in responses where we can't fetch it (circular dependency prevention)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String customerName;
     private String productName;
     private String icon;
     private String ratePlanName;
     private String ratePlanType;
+    
     private Long organizationId;
 
     // Billing cycle fields

@@ -110,6 +110,74 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return resp;
     }
 
+    /**
+     * Enrichment WITHOUT customer service call.
+     * Use when this endpoint is called BY customer service to avoid circular dependency.
+     * Enriches with product, rate plan, and billable metrics data only.
+     */
+    private SubscriptionResponse enrichWithoutCustomer(Subscription subscription) {
+        SubscriptionResponse resp = mapper.toResponse(subscription);
+        // SKIP customer enrichment to avoid circular dependency when called from customer service
+        try {
+            if (subscription.getProductId() != null) {
+                ProductDTO p = productRatePlanClient.getProduct(subscription.getProductId());
+                if (p != null) {
+                    resp.setProductName(p.getProductName());
+                    resp.setIcon(p.getIcon());
+                }
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (subscription.getRatePlanId() != null) {
+                RatePlanDTO rp = productRatePlanClient.getRatePlan(subscription.getRatePlanId());
+                if (rp != null) {
+                    resp.setRatePlanName(rp.getRatePlanName());
+
+                    String ratePlanType = rp.getRatePlanType();
+
+                    if (ratePlanType == null) {
+                        if (rp.getUsageBasedPricings() != null && !rp.getUsageBasedPricings().isEmpty()
+                                && rp.getUsageBasedPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getUsageBasedPricings().get(0).getRatePlanType();
+                        } else if (rp.getTieredPricings() != null && !rp.getTieredPricings().isEmpty()
+                                && rp.getTieredPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getTieredPricings().get(0).getRatePlanType();
+                        } else if (rp.getVolumePricings() != null && !rp.getVolumePricings().isEmpty()
+                                && rp.getVolumePricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getVolumePricings().get(0).getRatePlanType();
+                        } else if (rp.getStairStepPricings() != null && !rp.getStairStepPricings().isEmpty()
+                                && rp.getStairStepPricings().get(0).getRatePlanType() != null) {
+                            ratePlanType = rp.getStairStepPricings().get(0).getRatePlanType();
+                        } else if (rp.getFlatFee() != null && rp.getFlatFee().getRatePlanType() != null) {
+                            ratePlanType = rp.getFlatFee().getRatePlanType();
+                        }
+                    }
+
+                    if (ratePlanType != null) {
+                        resp.setRatePlanType(ratePlanType);
+                    }
+                    // Enrich with billing frequency
+                    if (rp.getBillingFrequency() != null) {
+                        resp.setBillingFrequency(rp.getBillingFrequency());
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (subscription.getProductId() != null) {
+                List<BillableMetricDTO> billableMetrics = billableMetricsClient.getBillableMetricsByProduct(subscription.getProductId());
+                if (billableMetrics != null && !billableMetrics.isEmpty()) {
+                    BillableMetricDTO firstMetric = billableMetrics.get(0);
+                    resp.setBillableUid(firstMetric.getBillableUid());
+                    resp.setUsageCondition(firstMetric.getUsageCondition());
+                    resp.setUnitOfMeasure(firstMetric.getUnitOfMeasure());
+                    resp.setBillingCriteria(firstMetric.getBillingCriteria());
+                }
+            }
+        } catch (Exception ignored) {}
+        return resp;
+    }
+
     @Override
     public SubscriptionResponse confirmSubscription(Long subscriptionId) {
         Long orgId = TenantContext.require();
@@ -134,6 +202,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscription.setLastUpdated(Instant.now());
             subscription = repository.save(subscription);
         }
+        // Return fully enriched DTO including customer name
+        // Safe to call customer service here - this is NOT called by customer service
         return enrich(subscription);
     }
 
@@ -178,6 +248,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscription = repository.save(subscription);
         }
         
+        // Return fully enriched DTO including customer name
+        // Safe to call customer service here - CREATE is called directly by clients, not by customer service
         return enrich(subscription);
     }
 
@@ -204,6 +276,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Apply updates
         mapper.updateEntityFromRequest(request, subscription);
 
+        // Return fully enriched DTO including customer name
+        // Safe to call customer service here - UPDATE is called directly by clients, not by customer service
         return enrich(repository.save(subscription));
     }
 
@@ -228,9 +302,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional(readOnly = true)
     public List<SubscriptionResponse> getSubscriptionsByCustomerId(Long customerId) {
         Long orgId = TenantContext.require();
+        // Use enrichWithoutCustomer to avoid circular dependency when customer service calls this
+        // Customer service already has customer data, doesn't need us to call back
         return repository.findByCustomerIdAndOrganizationId(customerId, orgId)
                 .stream()
-                .map(this::enrich)
+                .map(subscription -> enrichWithoutCustomer(subscription))
                 .collect(Collectors.toList());
     }
 
@@ -287,6 +363,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         subscription = repository.save(subscription);
         
+        // Return fully enriched DTO including customer name
+        // Safe to call customer service here - this is internal billing operation, not called by customer service
         return enrich(subscription);
     }
 
