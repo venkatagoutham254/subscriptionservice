@@ -9,4 +9,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TieredPricingDTO {
     private String ratePlanType;
+    
+    // Explicit getter for ratePlanType
+    public String getRatePlanType() {
+        return ratePlanType;
+    }
 }

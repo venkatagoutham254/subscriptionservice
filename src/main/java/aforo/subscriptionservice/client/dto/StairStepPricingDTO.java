@@ -9,4 +9,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StairStepPricingDTO {
     private String ratePlanType;
+
+    // Explicit getter (Lombok not configured in this project)
+    public String getRatePlanType() {
+        return ratePlanType;
+    }
 }

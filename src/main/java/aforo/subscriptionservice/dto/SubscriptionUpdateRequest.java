@@ -27,5 +27,29 @@ public class SubscriptionUpdateRequest {
     private Long productId;
 
     private Long ratePlanId;
-
+    
+    // Explicit getters (Lombok not configured in this project)
+    public String getAdminNotes() {
+        return adminNotes;
+    }
+    
+    public SubscriptionStatus getStatus() {
+        return status;
+    }
+    
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+    
+    public Long getCustomerId() {
+        return customerId;
+    }
+    
+    public Long getProductId() {
+        return productId;
+    }
+    
+    public Long getRatePlanId() {
+        return ratePlanId;
+    }
 }

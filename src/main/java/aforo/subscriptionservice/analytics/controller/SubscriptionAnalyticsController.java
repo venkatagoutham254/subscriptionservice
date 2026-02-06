@@ -13,8 +13,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions/analytics")
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class SubscriptionAnalyticsController {
 

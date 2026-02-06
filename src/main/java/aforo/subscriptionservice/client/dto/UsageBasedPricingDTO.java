@@ -10,4 +10,9 @@ public class UsageBasedPricingDTO {
     private Long ratePlanId;
     private Double perUnitAmount;
     private String ratePlanType;
+    
+    // Explicit getter for ratePlanType
+    public String getRatePlanType() {
+        return ratePlanType;
+    }
 }

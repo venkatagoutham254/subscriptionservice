@@ -21,4 +21,46 @@ public class RatePlanDTO {
 	private List<UsageBasedPricingDTO> usageBasedPricings;
 	private List<TieredPricingDTO> tieredPricings;
 	private List<StairStepPricingDTO> stairStepPricings;
+
+	// Explicit getters for fields (Lombok not configured in this project)
+	public FlatFeeDTO getFlatFee() {
+		return flatFee;
+	}
+
+	public List<VolumePricingDTO> getVolumePricings() {
+		return volumePricings;
+	}
+
+	public List<UsageBasedPricingDTO> getUsageBasedPricings() {
+		return usageBasedPricings;
+	}
+
+	public List<TieredPricingDTO> getTieredPricings() {
+		return tieredPricings;
+	}
+
+	public List<StairStepPricingDTO> getStairStepPricings() {
+		return stairStepPricings;
+	}
+	
+	// Additional explicit getters
+	public Long getRatePlanId() {
+		return ratePlanId;
+	}
+	
+	public Long getProductId() {
+		return productId;
+	}
+	
+	public String getRatePlanName() {
+		return ratePlanName;
+	}
+	
+	public String getRatePlanType() {
+		return ratePlanType;
+	}
+	
+	public String getBillingFrequency() {
+		return billingFrequency;
+	}
 }

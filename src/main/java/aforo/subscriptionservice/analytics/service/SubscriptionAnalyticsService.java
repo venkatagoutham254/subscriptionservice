@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,7 +160,7 @@ public class SubscriptionAnalyticsService {
     }
 
     private boolean checkForOverdueRenewals(List<Subscription> subscriptions) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         return subscriptions.stream()
                 .anyMatch(s -> s.getNextBillingTimestamp() != null && 
                               s.getNextBillingTimestamp().isBefore(now) &&

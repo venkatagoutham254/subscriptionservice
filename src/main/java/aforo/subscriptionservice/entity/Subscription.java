@@ -86,4 +86,126 @@ public class Subscription {
      */
     @Column(name = "auto_renew")
     private Boolean autoRenew;
+    
+    // Explicit getters (Lombok not configured in this project)
+    public Long getSubscriptionId() {
+        return subscriptionId;
+    }
+    
+    public Long getCustomerId() {
+        return customerId;
+    }
+    
+    public Long getProductId() {
+        return productId;
+    }
+    
+    public Long getRatePlanId() {
+        return ratePlanId;
+    }
+    
+    public SubscriptionStatus getStatus() {
+        return status;
+    }
+    
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+    
+    public Instant getCreatedOn() {
+        return createdOn;
+    }
+    
+    public Instant getLastUpdated() {
+        return lastUpdated;
+    }
+    
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+    
+    public String getAdminNotes() {
+        return adminNotes;
+    }
+    
+    public Instant getCurrentBillingPeriodStart() {
+        return currentBillingPeriodStart;
+    }
+    
+    public Instant getCurrentBillingPeriodEnd() {
+        return currentBillingPeriodEnd;
+    }
+    
+    public Instant getNextBillingTimestamp() {
+        return nextBillingTimestamp;
+    }
+    
+    public String getBillingAnchorInfo() {
+        return billingAnchorInfo;
+    }
+    
+    public Boolean getAutoRenew() {
+        return autoRenew;
+    }
+    
+    // Explicit setters (Lombok not configured in this project)
+    public void setSubscriptionId(Long subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
+    
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+    
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+    
+    public void setRatePlanId(Long ratePlanId) {
+        this.ratePlanId = ratePlanId;
+    }
+    
+    public void setStatus(SubscriptionStatus status) {
+        this.status = status;
+    }
+    
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+    
+    public void setCreatedOn(Instant createdOn) {
+        this.createdOn = createdOn;
+    }
+    
+    public void setLastUpdated(Instant lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+    
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
+    
+    public void setAdminNotes(String adminNotes) {
+        this.adminNotes = adminNotes;
+    }
+    
+    public void setCurrentBillingPeriodStart(Instant currentBillingPeriodStart) {
+        this.currentBillingPeriodStart = currentBillingPeriodStart;
+    }
+    
+    public void setCurrentBillingPeriodEnd(Instant currentBillingPeriodEnd) {
+        this.currentBillingPeriodEnd = currentBillingPeriodEnd;
+    }
+    
+    public void setNextBillingTimestamp(Instant nextBillingTimestamp) {
+        this.nextBillingTimestamp = nextBillingTimestamp;
+    }
+    
+    public void setBillingAnchorInfo(String billingAnchorInfo) {
+        this.billingAnchorInfo = billingAnchorInfo;
+    }
+    
+    public void setAutoRenew(Boolean autoRenew) {
+        this.autoRenew = autoRenew;
+    }
 }

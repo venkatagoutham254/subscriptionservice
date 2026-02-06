@@ -48,4 +48,65 @@ public class BillableMetricDTO {
         }
         return null;
     }
+    
+    // Explicit getters (Lombok not configured in this project)
+    public Long getBillableMetricId() {
+        return billableMetricId;
+    }
+    
+    public String getMetricName() {
+        return metricName;
+    }
+    
+    public Long getProductId() {
+        return productId;
+    }
+    
+    public String getProductName() {
+        return productName;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+    
+    public String getUnitOfMeasure() {
+        return unitOfMeasure;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public String getAggregationFunction() {
+        return aggregationFunction;
+    }
+    
+    public String getAggregationWindow() {
+        return aggregationWindow;
+    }
+    
+    public List<UsageConditionDTO> getUsageConditions() {
+        return usageConditions;
+    }
+    
+    public String getBillingCriteria() {
+        return billingCriteria;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+    
+    public String getCreatedOn() {
+        return createdOn;
+    }
+    
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+    
+    public Long getOrganizationId() {
+        return organizationId;
+    }
 }
