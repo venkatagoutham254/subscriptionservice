@@ -15,6 +15,8 @@ import java.util.List;
 @RequestMapping("/api/subscriptions/analytics")
 @Slf4j
 @RequiredArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 @CrossOrigin(origins = "*")
 public class SubscriptionAnalyticsController {
 

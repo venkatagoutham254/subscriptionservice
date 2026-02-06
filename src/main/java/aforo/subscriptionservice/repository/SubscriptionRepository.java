@@ -56,6 +56,11 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     
     /**
+     * Find subscriptions by customer and organization
+     */
+    List<Subscription> findByCustomerIdAndOrganizationId(Long customerId, Long organizationId);
+
+    /**
      * Find all subscriptions for a list of customer IDs
      */
     @Query("SELECT s FROM Subscription s WHERE s.customerId IN :customerIds AND s.organizationId = :organizationId")
