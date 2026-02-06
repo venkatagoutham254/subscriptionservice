@@ -8,4 +8,13 @@ import lombok.Setter;
 public class CustomerDTO {
     private Long customerId;
     private String customerName;
+    
+    // Explicit getters (Lombok not configured in this project)
+    public Long getCustomerId() {
+        return customerId;
+    }
+    
+    public String getCustomerName() {
+        return customerName;
+    }
 }

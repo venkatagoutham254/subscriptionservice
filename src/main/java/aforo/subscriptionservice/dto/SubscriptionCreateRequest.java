@@ -24,4 +24,25 @@ public class SubscriptionCreateRequest {
 
 
     private String adminNotes;
+    
+    // Explicit getters (Lombok not configured in this project)
+    public Long getCustomerId() {
+        return customerId;
+    }
+    
+    public Long getProductId() {
+        return productId;
+    }
+    
+    public Long getRatePlanId() {
+        return ratePlanId;
+    }
+    
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+    
+    public String getAdminNotes() {
+        return adminNotes;
+    }
 }

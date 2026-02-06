@@ -9,6 +9,7 @@ import aforo.subscriptionservice.entity.Subscription;
 import aforo.subscriptionservice.entity.SubscriptionStatus;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
@@ -53,6 +54,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     @Query("SELECT COUNT(s) FROM Subscription s WHERE s.customerId = :customerId AND s.status = 'ACTIVE'")
     Long countActiveByCustomerId(@Param("customerId") Long customerId);
 
+    
     /**
      * Find subscriptions by customer and organization
      */
